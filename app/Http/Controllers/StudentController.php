@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
-     // Display all students
+    // Display all students
     public function index()
     {
         $students = Student::all();
@@ -23,17 +25,12 @@ class StudentController extends Controller
     // Save a new student
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email',
-            'phone' => 'required|string|max:20',
-            'address' => 'nullable|string',
-            'date_of_birth' => 'nullable|date',
-        ]);
+        $validated = $request->validate($this->rules());
 
         Student::create($validated);
 
-        return redirect('/students')->with('success', 'Student created successfully!');
+        return redirect()->route('students.index')
+            ->with('success', 'Student created successfully!');
     }
 
     // Display one student
@@ -51,17 +48,12 @@ class StudentController extends Controller
     // Update a student
     public function update(Request $request, Student $student)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email,' . $student->id,
-            'phone' => 'required|string|max:20',
-            'address' => 'nullable|string',
-            'date_of_birth' => 'nullable|date',
-        ]);
+        $validated = $request->validate($this->rules($student));
 
         $student->update($validated);
 
-        return redirect('/students')->with('success', 'Student updated successfully!');
+        return redirect()->route('students.index')
+            ->with('success', 'Student updated successfully!');
     }
 
     // Delete a student
@@ -69,6 +61,23 @@ class StudentController extends Controller
     {
         $student->delete();
 
-        return redirect('/students')->with('success', 'Student deleted successfully!');
+        return redirect()->route('students.index')
+            ->with('success', 'Student deleted successfully!');
+    }
+
+    // Reusable student validation rules
+    private function rules(?Student $student = null): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('students', 'email')->ignore($student?->id),
+            ],
+            'phone' => 'required|string|max:20',
+            'address' => 'nullable|string',
+            'date_of_birth' => 'nullable|date',
+        ];
     }
 }

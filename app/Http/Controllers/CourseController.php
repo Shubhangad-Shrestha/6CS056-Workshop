@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
@@ -24,19 +25,14 @@ class CourseController extends Controller
     // Save a new course
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'duration' => 'required|integer|min:1',
-            'fee' => 'required|numeric|min:0',
-            'difficulty' => 'required|in:Easy,Medium,Hard',
-        ]);
+        $validated = $request->validate($this->rules());
 
         $validated['is_active'] = $request->boolean('is_active');
 
         Course::create($validated);
 
-        return redirect('/courses')->with('success', 'Course created successfully!');
+        return redirect()->route('courses.index')
+            ->with('success', 'Course created successfully!');
     }
 
     // Display one course
@@ -54,19 +50,14 @@ class CourseController extends Controller
     // Update a course
     public function update(Request $request, Course $course)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'duration' => 'required|integer|min:1',
-            'fee' => 'required|numeric|min:0',
-            'difficulty' => 'required|in:Easy,Medium,Hard',
-        ]);
+        $validated = $request->validate($this->rules());
 
         $validated['is_active'] = $request->boolean('is_active');
 
         $course->update($validated);
 
-        return redirect('/courses')->with('success', 'Course updated successfully!');
+        return redirect()->route('courses.index')
+            ->with('success', 'Course updated successfully!');
     }
 
     // Delete a course
@@ -74,6 +65,23 @@ class CourseController extends Controller
     {
         $course->delete();
 
-        return redirect('/courses')->with('success', 'Course deleted successfully!');
+        return redirect()->route('courses.index')
+            ->with('success', 'Course deleted successfully!');
+    }
+
+    // Reusable course validation rules
+    private function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'duration' => 'required|integer|min:1',
+            'fee' => 'required|numeric|min:0',
+            'difficulty' => [
+                'required',
+                Rule::in(['Easy', 'Medium', 'Hard']),
+            ],
+            'is_active' => 'boolean',
+        ];
     }
 }

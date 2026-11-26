@@ -1,20 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student List</title>
-</head>
-<body>
+
+<x-layouts.app>
     <h1>Students</h1>
 
-    <a href="/students/create">Add New Student</a>
+    <x-alert />
 
-    <table border="1" cellpadding="10">
+    <a href="{{ route('students.create') }}" class="btn">
+        Add New Student
+    </a>
+
+    <br><br>
+
+    <table border="1" cellpadding="10" width="100%">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Age</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -26,28 +29,27 @@
                     <td>{{ $student->name }}</td>
                     <td>{{ $student->email }}</td>
                     <td>{{ $student->phone }}</td>
+                    <td>{{ $student->age ?? 'N/A' }}</td>
+
                     <td>
-                        <a href="/students/{{ $student->id }}">View</a>
+                        <a href="{{ route('students.show', $student) }}">View</a>
 
-<a href="/students/{{ $student->id }}/edit">Edit</a>
+                        |
 
-<form action="/students/{{ $student->id }}" method="POST" style="display:inline;">
-    @csrf
-    @method('DELETE')
+                        <a href="{{ route('students.edit', $student) }}">Edit</a>
 
-    <button type="submit"
-        onclick="return confirm('Are you sure you want to delete this student?')">
-        Delete
-    </button>
-</form>
+                        |
+
+                        <x-delete-form
+                            :action="route('students.destroy', $student)"
+                        />
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">No students found.</td>
+                    <td colspan="6">No students found.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
-</body>
-</html>
+</x-layouts.app>

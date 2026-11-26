@@ -1,48 +1,12 @@
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Student</title>
-</head>
-<body>
+<x-layouts.app>
     <h1>Add New Student</h1>
 
-    <a href="/students">Back to Students</a>
+    <a href="{{ route('students.index') }}">Back to Students</a>
 
-    @if ($errors->any())
-        <div>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <br><br>
 
-    <form action="/students" method="POST">
-        @csrf
-
-        <label>Name:</label>
-        <input type="text" name="name" value="{{ old('name') }}" required>
-        <br><br>
-
-        <label>Email:</label>
-        <input type="email" name="email" value="{{ old('email') }}" required>
-        <br><br>
-
-        <label>Phone:</label>
-        <input type="text" name="phone" value="{{ old('phone') }}" required>
-        <br><br>
-
-        <label>Address:</label>
-        <textarea name="address">{{ old('address') }}</textarea>
-        <br><br>
-
-        <label>Date of Birth:</label>
-        <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}">
-        <br><br>
-
-        <button type="submit">Save Student</button>
-    </form>
-</body>
-</html>
+    <x-students.form
+        :action="route('students.store')"
+    />
+</x-layouts.app>

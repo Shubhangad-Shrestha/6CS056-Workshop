@@ -1,15 +1,16 @@
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Course List</title>
-</head>
-<body>
+<x-layouts.app>
     <h1>Courses</h1>
 
-    <a href="/courses/create">Add New Course</a>
+    <x-alert />
 
-    <table border="1" cellpadding="10">
+    <a href="{{ route('courses.create') }}" class="btn">
+        Add New Course
+    </a>
+
+    <br><br>
+
+    <table border="1" cellpadding="10" width="100%">
         <thead>
             <tr>
                 <th>ID</th>
@@ -31,18 +32,16 @@
                     <td>{{ $course->fee }}</td>
                     <td>{{ $course->difficulty }}</td>
                     <td>{{ $course->is_active ? 'Active' : 'Inactive' }}</td>
-                    <td>
-    <a href="/courses/{{ $course->id }}">View</a>
-    <a href="/courses/{{ $course->id }}/edit">Edit</a>
 
-    <form action="/courses/{{ $course->id }}" method="POST" style="display:inline;">
-        @csrf
-        @method('DELETE')
-        <button type="submit" onclick="return confirm('Are you sure you want to delete this course?')">
-            Delete
-        </button>
-    </form>
-</td>
+                    <td>
+                        <a href="{{ route('courses.show', $course) }}">View</a>
+                        |
+                        <a href="{{ route('courses.edit', $course) }}">Edit</a>
+                        |
+                        <x-delete-form
+                            :action="route('courses.destroy', $course)"
+                        />
+                    </td>
                 </tr>
             @empty
                 <tr>
@@ -51,5 +50,4 @@
             @endforelse
         </tbody>
     </table>
-</body>
-</html>
+</x-layouts.app>
